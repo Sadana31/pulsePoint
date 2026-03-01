@@ -144,7 +144,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="h-[calc(100vh-80px)] bg-slate-50 flex flex-col overflow-hidden">
+    <div className="px-20 bg-slate-50 flex flex-col overflow-hidden">
       <div className="mx-auto w-full max-w-7xl h-full flex flex-col gap-4">
         {/* TOP SECTION */}
         <div className="flex gap-4 h-[30%]">
