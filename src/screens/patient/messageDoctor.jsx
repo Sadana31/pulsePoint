@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom"; // Added Link
-import { collection, addDoc, getDocs, query, where, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import toast from "react-hot-toast";
 
@@ -16,15 +23,15 @@ export default function MessageDoctor() {
     category: "General Consultation",
     title: "",
     message: "",
-    severity: 3
+    severity: 3,
   });
 
   useEffect(() => {
     const fetchDoctors = async () => {
       const snapshot = await getDocs(collection(db, "doctors"));
-      const list = snapshot.docs.map(doc => ({
+      const list = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setDoctors(list);
     };
@@ -33,9 +40,9 @@ export default function MessageDoctor() {
 
   function updateField(e) {
     const { name, value } = e.target;
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: name === "severity" ? Number(value) : value
+      [name]: name === "severity" ? Number(value) : value,
     }));
   }
 
@@ -44,7 +51,7 @@ export default function MessageDoctor() {
       if (!user) return;
 
       const snapshot = await getDocs(
-        query(collection(db, "patients"), where("email", "==", user.email))
+        query(collection(db, "patients"), where("email", "==", user.email)),
       );
 
       if (!snapshot.empty) {
@@ -66,7 +73,7 @@ export default function MessageDoctor() {
 
     try {
       const selectedDoctor = doctors.find(
-        doc => doc.doctorID === form.doctor
+        (doc) => doc.doctorID === form.doctor,
       );
 
       await addDoc(collection(db, "queries"), {
@@ -80,12 +87,11 @@ export default function MessageDoctor() {
         message: form.message,
         severity: form.severity,
         status: "open",
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       toast.success("Message sent successfully!");
       navigate("/dashboard");
-
     } catch (error) {
       console.error(error);
     }
@@ -96,7 +102,6 @@ export default function MessageDoctor() {
   return (
     <div className="min-h-screen bg-slate-50 text-black selection:bg-teal-100">
       <div className="flex w-full flex-col gap-10 px-20">
-
         {/* HEADER */}
         <header className="flex flex-col gap-6 border-b-4 border-[#009999] pb-10">
           <div className="flex items-center justify-between">
@@ -117,7 +122,9 @@ export default function MessageDoctor() {
               to="/answers"
               className="group flex items-center gap-3 rounded-2xl border-2 border-[#009999] bg-white px-8 py-4 transition-all hover:bg-[#009999] hover:text-white active:scale-95"
             >
-              <span className="text-2xl transition-transform group-hover:scale-110">📩</span>
+              <span className="text-2xl transition-transform group-hover:scale-110">
+                📩
+              </span>
               <span className="text-sm font-black uppercase tracking-widest text-[#009999] group-hover:text-white">
                 View My Answers
               </span>
@@ -125,7 +132,8 @@ export default function MessageDoctor() {
           </div>
 
           <p className="max-w-xl text-lg font-medium leading-relaxed text-slate-500">
-            Send a structured clinical inquiry directly to your healthcare provider.
+            Send a structured clinical inquiry directly to your healthcare
+            provider.
           </p>
         </header>
 
@@ -147,7 +155,7 @@ export default function MessageDoctor() {
                   className="rounded-2xl border-2 border-slate-100 bg-slate-50 px-6 py-4 text-base font-medium transition-all focus:border-[#009999] focus:bg-white focus:outline-none"
                 >
                   <option value="">Select a doctor</option>
-                  {doctors.map(doc => (
+                  {doctors.map((doc) => (
                     <option key={doc.id} value={doc.doctorID}>
                       Dr. {doc.doctorName} - {doc.specialization}
                     </option>

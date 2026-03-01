@@ -12,7 +12,7 @@ const DoctorAppointments = () => {
       if (!user) return;
 
       const snapshot = await getDocs(
-        query(collection(db, "doctors"), where("email", "==", user.email))
+        query(collection(db, "doctors"), where("email", "==", user.email)),
       );
 
       if (!snapshot.empty) {
@@ -33,13 +33,13 @@ const DoctorAppointments = () => {
         query(
           collection(db, "appointments"),
           where("doctorID", "==", doctorID),
-          where("status", "==", "booked")
-        )
+          where("status", "==", "booked"),
+        ),
       );
 
-      const list = snapshot.docs.map(doc => ({
+      const list = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
 
       setAppointments(list);
@@ -82,7 +82,7 @@ const DoctorAppointments = () => {
               </div>
               <span
                 className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.1em] border-2 ${getPriorityStyles(
-                  apt.priority
+                  apt.priority,
                 )}`}
               >
                 {apt.priority}
@@ -102,9 +102,7 @@ const DoctorAppointments = () => {
               <p className="text-[12px] font-black uppercase tracking-widest mb-2">
                 Primary Concern
               </p>
-              <p className="text-slate-600 font-bold italic">
-                {apt.reason}
-              </p>
+              <p className="text-slate-600 font-bold italic">{apt.reason}</p>
             </div>
 
             <button className="w-full py-4 bg-[#006666] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]">

@@ -15,7 +15,7 @@ const MyAnswers = () => {
       try {
         // 🔥 Fetch patient document
         const patientSnap = await getDocs(
-          query(collection(db, "patients"), where("email", "==", user.email))
+          query(collection(db, "patients"), where("email", "==", user.email)),
         );
 
         if (patientSnap.empty) {
@@ -31,18 +31,17 @@ const MyAnswers = () => {
           query(
             collection(db, "answers"),
             where("patientID", "==", patientID),
-            orderBy("createdAt", "desc")
-          )
+            orderBy("createdAt", "desc"),
+          ),
         );
 
-        const list = answersSnap.docs.map(doc => ({
+        const list = answersSnap.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
 
         setReplies(list);
         if (list.length > 0) setSelectedReply(list[0]);
-
       } catch (error) {
         console.error("Error fetching replies:", error);
       }
@@ -75,10 +74,8 @@ const MyAnswers = () => {
       </header>
 
       <div className="flex-1 flex gap-8 min-h-0">
-
         {/* --- LEFT: LIST OF REPLIES --- */}
         <div className="w-[400px] flex flex-col gap-4 overflow-y-auto pr-2">
-
           {replies.map((r) => (
             <button
               key={r.id}
@@ -131,7 +128,6 @@ const MyAnswers = () => {
               </div>
 
               <div className="relative z-10 flex-1 overflow-y-auto pr-4">
-
                 <div className="flex justify-between items-start mb-10">
                   <div>
                     <h2 className="text-4xl font-black text-black mb-2">
@@ -153,7 +149,6 @@ const MyAnswers = () => {
                 </div>
 
                 <div className="bg-slate-50 rounded-[3rem] p-10 border-2 border-slate-100 mb-8">
-
                   <div className="flex items-center gap-4 mb-8">
                     <div className="h-14 w-14 rounded-2xl bg-[#009999] flex items-center justify-center text-2xl">
                       👨‍⚕️
@@ -176,7 +171,6 @@ const MyAnswers = () => {
                       "{selectedReply.answerText}"
                     </p>
                   </div>
-
                 </div>
               </div>
 

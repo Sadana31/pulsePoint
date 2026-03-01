@@ -28,11 +28,9 @@ export default function Login() {
 
   return (
     <div className="h-screen w-full flex overflow-hidden bg-white">
-
       {/* LEFT SIDE */}
       <div className="w-full lg:w-[40%] flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-
           <header className="mb-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#009999] text-3xl text-white shadow-lg shadow-[#009999]/20 mb-6">
               🩺
@@ -57,7 +55,6 @@ export default function Login() {
             />
             Continue with Google
           </button>
-
         </div>
       </div>
 
@@ -83,7 +80,8 @@ export default function Login() {
               <div>
                 <h4 className="text-2xl font-bold mb-2">AI-Driven Triage</h4>
                 <p className="text-lg text-white/70 leading-relaxed font-medium">
-                  Real-time symptom analysis based on the SymbiPredict clinical dataset.
+                  Real-time symptom analysis based on the SymbiPredict clinical
+                  dataset.
                 </p>
               </div>
             </div>
@@ -95,15 +93,14 @@ export default function Login() {
               <div>
                 <h4 className="text-2xl font-bold mb-2">Instant Scheduling</h4>
                 <p className="text-lg text-white/70 leading-relaxed font-medium">
-                  Direct integration with provider calendars for seamless booking.
+                  Direct integration with provider calendars for seamless
+                  booking.
                 </p>
               </div>
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }

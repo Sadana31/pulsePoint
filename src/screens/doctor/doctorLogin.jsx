@@ -30,11 +30,9 @@ export default function DoctorLogin() {
 
   return (
     <div className="h-screen w-full flex overflow-hidden bg-white">
-
       {/* LEFT SIDE */}
       <div className="w-full lg:w-[40%] flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-
           <header className="mb-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#006666] text-3xl text-white shadow-lg shadow-[#006666]/20 mb-6">
               👨‍⚕️
@@ -63,7 +61,6 @@ export default function DoctorLogin() {
           <p className="mt-8 text-sm text-slate-400 text-center">
             Authorized medical personnel only. Access is monitored.
           </p>
-
         </div>
       </div>
 
@@ -89,7 +86,8 @@ export default function DoctorLogin() {
               <div>
                 <h4 className="text-2xl font-bold mb-2">Centralized EHR</h4>
                 <p className="text-lg text-white/70 leading-relaxed font-medium">
-                  Unified access to patient history, lab results, and AI-triage summaries.
+                  Unified access to patient history, lab results, and AI-triage
+                  summaries.
                 </p>
               </div>
             </div>
@@ -101,15 +99,14 @@ export default function DoctorLogin() {
               <div>
                 <h4 className="text-2xl font-bold mb-2">Practice Efficiency</h4>
                 <p className="text-lg text-white/70 leading-relaxed font-medium">
-                  Optimized scheduling workflows and instant emergency alert for high-risk cases.
+                  Optimized scheduling workflows and instant emergency alert for
+                  high-risk cases.
                 </p>
               </div>
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }

@@ -27,24 +27,44 @@ export default function Profile() {
       }
 
       try {
-        const q = query(
-          collection(db, "patients"),
-          where("email", "==", currentUser.email)
+        const userRef = doc(db, "patients", currentUser.uid);
+        const docSnap = await getDocs(
+          query(
+            collection(db, "patients"),
+            where("__name__", "==", currentUser.uid),
+          ),
         );
 
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const docSnap = querySnapshot.docs[0];
-
-          setUser(docSnap.data());
-          setFormData(docSnap.data());
-          setDocId(docSnap.id); // 🔥 important for update
+        if (!docSnap.empty) {
+          const data = docSnap.docs[0].data();
+          setUser(data);
+          setFormData(data);
+          setDocId(currentUser.uid);
         } else {
-          console.log("No patient found with this email.");
+          // 🔥 AUTO CREATE ON FIRST LOGIN
+          const newPatient = {
+            name: currentUser.displayName || "",
+            email: currentUser.email,
+            patientID: currentUser.uid,
+            createdAt: new Date(),
+            age: "",
+            bloodGroup: "",
+            phone: "",
+            location: "",
+            emergencyContact: "",
+            emergencyPhone: "",
+          };
+
+          await setDoc(userRef, newPatient);
+
+          setUser(newPatient);
+          setFormData(newPatient);
+          setDocId(currentUser.uid);
+
+          toast.success("Patient profile auto-created!");
         }
       } catch (error) {
-        console.error("Error fetching patient:", error);
+        console.error(error);
       }
 
       setLoading(false);
@@ -54,74 +74,71 @@ export default function Profile() {
   }, []);
 
   const handleChange = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  // Phone validation (10 digits max, numbers only)
-  if (name === "phone" || name === "emergencyPhone") {
-    if (/^\d{0,10}$/.test(value)) {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-    return;
-  }
-
-  // Email validation (basic)
-  if (name === "email") {
-    setFormData((prev) => ({ ...prev, email: value }));
-    return;
-  }
-
-  setFormData((prev) => ({ ...prev, [name]: value }));
-};
-const saveChanges = async () => {
-  try {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      toast.error("User not authenticated.");
+    // Phone validation (10 digits max, numbers only)
+    if (name === "phone" || name === "emergencyPhone") {
+      if (/^\d{0,10}$/.test(value)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
       return;
     }
 
-    let userRef;
-
-    // If document already exists → update
-    if (docId) {
-      userRef = doc(db, "patients", docId);
-      await updateDoc(userRef, formData);
-      toast.success("Profile updated successfully!");
-    } 
-    // If document does NOT exist → create
-    else {
-      userRef = doc(collection(db, "patients")); // auto ID
-
-      const newPatient = {
-        ...formData,
-        email: currentUser.email,
-        patientID: userRef.id,
-        createdAt: new Date(),
-      };
-
-      await setDoc(userRef, newPatient);
-
-      setDocId(userRef.id);
-      setUser(newPatient);
-      setFormData(newPatient);
-
-      toast.success("Profile created successfully!");
+    // Email validation (basic)
+    if (name === "email") {
+      setFormData((prev) => ({ ...prev, email: value }));
+      return;
     }
 
-    setIsEditing(false);
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const saveChanges = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        toast.error("User not authenticated.");
+        return;
+      }
 
-  } catch (error) {
-    console.error("Error saving profile:", error);
-    toast.error("Something went wrong.");
-  }
-};
+      let userRef;
+
+      // If document already exists → update
+      if (docId) {
+        userRef = doc(db, "patients", docId);
+        await updateDoc(userRef, formData);
+        toast.success("Profile updated successfully!");
+      }
+      // If document does NOT exist → create
+      else {
+        userRef = doc(collection(db, "patients")); // auto ID
+
+        const newPatient = {
+          ...formData,
+          email: currentUser.email,
+          patientID: userRef.id,
+          createdAt: new Date(),
+        };
+
+        await setDoc(userRef, newPatient);
+
+        setDocId(userRef.id);
+        setUser(newPatient);
+        setFormData(newPatient);
+
+        toast.success("Profile created successfully!");
+      }
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      toast.error("Something went wrong.");
+    }
+  };
 
   if (loading) {
     return (
       <div className="h-[calc(100vh-80px)] bg-slate-50 flex items-center justify-center">
-        <p className="text-[#009999] font-bold text-lg">
-          Loading Profile...
-        </p>
+        <p className="text-[#009999] font-bold text-lg">Loading Profile...</p>
       </div>
     );
   }
@@ -129,7 +146,6 @@ const saveChanges = async () => {
   return (
     <div className="h-[calc(100vh-80px)] bg-slate-50 flex flex-col overflow-hidden">
       <div className="mx-auto w-full max-w-7xl h-full flex flex-col gap-4">
-
         {/* TOP SECTION */}
         <div className="flex gap-4 h-[30%]">
           <header className="flex-[2] rounded-3xl bg-white border-2 border-slate-100 p-8 shadow-sm flex items-center gap-8">
@@ -215,55 +231,95 @@ const saveChanges = async () => {
             </div>
 
             <div className="grid grid-cols-2 gap-x-12 gap-y-8">
-              <DetailBox label="Full Name" name="name" value={formData.name} isEditing={isEditing} onChange={handleChange} />
-              <DetailBox label="Biological Age" name="age" value={formData.age} isEditing={isEditing} onChange={handleChange} />
-              <DetailBox label="Blood Group" name="bloodGroup" value={formData.bloodGroup} isEditing={isEditing} onChange={handleChange} />
-              <DetailBox label="Primary Phone" name="phone" value={formData.phone} isEditing={isEditing} onChange={handleChange} />
-              <DetailBox label="Registry Email" name="email" value={formData.email} isEditing={isEditing} onChange={handleChange} />
-              <DetailBox label="Current Location" name="location" value={formData.location} isEditing={isEditing} onChange={handleChange} />
+              <DetailBox
+                label="Full Name"
+                name="name"
+                value={formData.name}
+                isEditing={isEditing}
+                onChange={handleChange}
+              />
+              <DetailBox
+                label="Biological Age"
+                name="age"
+                value={formData.age}
+                isEditing={isEditing}
+                onChange={handleChange}
+              />
+              <DetailBox
+                label="Blood Group"
+                name="bloodGroup"
+                value={formData.bloodGroup}
+                isEditing={isEditing}
+                onChange={handleChange}
+              />
+              <DetailBox
+                label="Primary Phone"
+                name="phone"
+                value={formData.phone}
+                isEditing={isEditing}
+                onChange={handleChange}
+              />
+              <DetailBox
+                label="Registry Email"
+                name="email"
+                value={formData.email}
+                isEditing={isEditing}
+                onChange={handleChange}
+              />
+              <DetailBox
+                label="Current Location"
+                name="location"
+                value={formData.location}
+                isEditing={isEditing}
+                onChange={handleChange}
+              />
             </div>
           </section>
 
           {/* EMERGENCY SECTION */}
           <div className="flex-1 flex flex-col gap-4">
             <section className="flex-1 rounded-3xl bg-gradient-to-br from-[#009999] to-[#007777] p-10 text-white shadow-xl flex flex-col justify-center">
-  <h3 className="text-xl font-black uppercase tracking-widest mb-6">
-    Emergency Contact
-  </h3>
+              <h3 className="text-xl font-black uppercase tracking-widest mb-6">
+                Emergency Contact
+              </h3>
 
-  {isEditing ? (
-    <div className="space-y-4">
-      <div>
-        <label className="text-sm font-bold opacity-80">Contact Name</label>
-        <input
-          name="emergencyContact"
-          value={formData.emergencyContact || ""}
-          onChange={handleChange}
-          className="mt-1 w-full rounded-lg bg-white/20 px-3 py-2 outline-none"
-        />
-      </div>
+              {isEditing ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-bold opacity-80">
+                      Contact Name
+                    </label>
+                    <input
+                      name="emergencyContact"
+                      value={formData.emergencyContact || ""}
+                      onChange={handleChange}
+                      className="mt-1 w-full rounded-lg bg-white/20 px-3 py-2 outline-none"
+                    />
+                  </div>
 
-      <div>
-        <label className="text-sm font-bold opacity-80">Contact Phone</label>
-        <input
-          name="emergencyPhone"
-          value={formData.emergencyPhone || ""}
-          onChange={handleChange}
-          className="mt-1 w-full rounded-lg bg-white/20 px-3 py-2 outline-none"
-        />
-      </div>
-    </div>
-  ) : (
-    <div className="space-y-3">
-      <p className="text-2xl font-black">
-        {formData.emergencyContact || "Not Provided"}
-      </p>
-      <p className="text-lg font-semibold opacity-90">
-        {formData.emergencyPhone || "—"}
-      </p>
-    </div>
-  )}
-</section>
+                  <div>
+                    <label className="text-sm font-bold opacity-80">
+                      Contact Phone
+                    </label>
+                    <input
+                      name="emergencyPhone"
+                      value={formData.emergencyPhone || ""}
+                      onChange={handleChange}
+                      className="mt-1 w-full rounded-lg bg-white/20 px-3 py-2 outline-none"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-2xl font-black">
+                    {formData.emergencyContact || "Not Provided"}
+                  </p>
+                  <p className="text-lg font-semibold opacity-90">
+                    {formData.emergencyPhone || "—"}
+                  </p>
+                </div>
+              )}
+            </section>
           </div>
         </div>
       </div>
@@ -291,7 +347,9 @@ function DetailBox({ label, name, value, isEditing, onChange }) {
           >
             <option value="">Select Age</option>
             {[...Array(101)].map((_, i) => (
-              <option key={i} value={i}>{i}</option>
+              <option key={i} value={i}>
+                {i}
+              </option>
             ))}
           </select>
         ) : isBlood ? (
@@ -303,7 +361,9 @@ function DetailBox({ label, name, value, isEditing, onChange }) {
           >
             <option value="">Select Blood Group</option>
             {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
-              <option key={group} value={group}>{group}</option>
+              <option key={group} value={group}>
+                {group}
+              </option>
             ))}
           </select>
         ) : (

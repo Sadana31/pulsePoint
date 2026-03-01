@@ -34,7 +34,6 @@ function LandingPage() {
       </p>
 
       <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
-
         {/* Patient Card */}
         <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm flex flex-col items-center text-center">
           <div className="w-20 h-20 bg-[#009688] rounded-full flex items-center justify-center mb-6">
@@ -49,12 +48,12 @@ function LandingPage() {
             Manage appointments and talk to Doctors.
           </p>
 
-<button
-  onClick={() => navigate("/login")} 
-  className="w-full py-3 bg-[#009688] text-white rounded-xl font-semibold"
->
-  Enter Patient Portal
-</button>
+          <button
+            onClick={() => navigate("/login")}
+            className="w-full py-3 bg-[#009688] text-white rounded-xl font-semibold"
+          >
+            Enter Patient Portal
+          </button>
         </div>
 
         {/* Doctor Card */}
@@ -78,7 +77,6 @@ function LandingPage() {
             Doctor Login
           </button>
         </div>
-
       </div>
     </div>
   );
@@ -87,37 +85,33 @@ function LandingPage() {
 // Inside App.js
 export default function App() {
   return (
-
-    
     // App.js
-<>
-<Toaster position="top-right" />
-<Routes>
-  <Route path="/" element={<LandingPage />} />
-  <Route path="/login/*" element={<Login />} />
-  <Route path="/doctorLogin/*" element={<DoctorLogin/>} />
-  
+    <>
+      <Toaster position="top-right" />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login/*" element={<Login />} />
+        <Route path="/doctorLogin/*" element={<DoctorLogin />} />
 
-  <Route element={<Layout/>}>
-    <Route path="/dashboard" element={<Home />} />
-    <Route path="/chat" element={<PatientChatbot />} />
-    <Route path="/appointment" element={<AppointmentRequest />} />
-    <Route path="/myvisits" element={<MyAppointments />} />
-    <Route path="/emergency" element={<EmergencyGuidance />} />
-    <Route path="/library" element={<CommonSymptoms />} />
-    <Route path="/profile" element={<Profile />} />
-    <Route path="/messageDoctor" element={<MessageDoctor />} />
-    <Route path="/reschedule" element={<RescheduleAppointment />} />
-    <Route path="/answers" element={<MyAnswers />} />
-  </Route>
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Home />} />
+          <Route path="/chat" element={<PatientChatbot />} />
+          <Route path="/appointment" element={<AppointmentRequest />} />
+          <Route path="/myvisits" element={<MyAppointments />} />
+          <Route path="/emergency" element={<EmergencyGuidance />} />
+          <Route path="/library" element={<CommonSymptoms />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/messageDoctor" element={<MessageDoctor />} />
+          <Route path="/reschedule" element={<RescheduleAppointment />} />
+          <Route path="/answers" element={<MyAnswers />} />
+        </Route>
 
-  <Route element={<DoctorLayout />}>
-    <Route path="/answer" element={<DoctorAnswering/>} />
-    <Route path="/doctorProfile" element={<DoctorProfile/>} />
-    <Route path="/doctorSchedule" element={<DoctorAppointments/>} />
-  </Route>
-  
-</Routes>
-</>
+        <Route element={<DoctorLayout />}>
+          <Route path="/answer" element={<DoctorAnswering />} />
+          <Route path="/doctorProfile" element={<DoctorProfile />} />
+          <Route path="/doctorSchedule" element={<DoctorAppointments />} />
+        </Route>
+      </Routes>
+    </>
   );
 }

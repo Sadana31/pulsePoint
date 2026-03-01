@@ -13,14 +13,13 @@ export default function GlobalActions() {
       }
     };
     window.addEventListener("keydown", handleEsc);
-    
+
     // Cleanup the listener when the component unmounts
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
   return (
     <>
-
       {/* CHAT BUBBLE */}
       <button
         onClick={() => navigate("/chat")}

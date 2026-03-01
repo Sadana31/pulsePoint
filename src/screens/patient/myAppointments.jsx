@@ -43,7 +43,9 @@ function AppointmentTable({ title, subtitle, data }) {
   return (
     <section className="rounded-[3rem] border-2 border-slate-100 bg-white p-10 shadow-[0_25px_60px_rgba(0,153,153,0.05)]">
       <div className="flex flex-col gap-1 border-l-8 border-[#009999] pl-8 mb-10">
-        <h2 className="text-4xl font-black tracking-tighter text-black">{title}</h2>
+        <h2 className="text-4xl font-black tracking-tighter text-black">
+          {title}
+        </h2>
         <p className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">
           {subtitle}
         </p>
@@ -63,7 +65,10 @@ function AppointmentTable({ title, subtitle, data }) {
 
           <tbody className="divide-y-2 divide-slate-50">
             {data.map((item) => (
-              <tr key={item.firebaseId} className="group transition-all hover:bg-slate-50/50">
+              <tr
+                key={item.firebaseId}
+                className="group transition-all hover:bg-slate-50/50"
+              >
                 <td className="px-6 py-8 font-black text-[#009999] text-lg">
                   #{item.id}
                 </td>
@@ -133,7 +138,7 @@ export default function MyAppointments() {
         // 1. Fetch Patient Info to get the PatientID
         const patientQuery = query(
           collection(db, "patients"),
-          where("email", "==", currentUser.email)
+          where("email", "==", currentUser.email),
         );
         const patientSnapshot = await getDocs(patientQuery);
 
@@ -150,11 +155,11 @@ export default function MyAppointments() {
           collection(db, "appointments"),
           where("patientID", "==", currentPatientID),
           where("status", "==", "booked"),
-          orderBy("createdAt", "desc")
+          orderBy("createdAt", "desc"),
         );
 
         const upcomingSnapshot = await getDocs(upcomingQuery);
-        
+
         const mappedData = upcomingSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
@@ -165,7 +170,8 @@ export default function MyAppointments() {
             specialty: data.specialization || "General Medicine",
             date: data.date,
             time: data.time,
-            status: data.status === "booked" ? "Confirmed" : "Awaiting confirmation",
+            status:
+              data.status === "booked" ? "Confirmed" : "Awaiting confirmation",
           };
         });
 
@@ -193,7 +199,6 @@ export default function MyAppointments() {
   return (
     <div className="min-h-screen bg-slate-50 text-black selection:bg-teal-100">
       <div className="px-20 flex w-full flex-col gap-12">
-        
         {/* HEADER */}
         <header className="flex flex-col gap-6 border-b-4 border-[#009999] pb-12">
           <div className="flex items-center gap-3">
@@ -206,7 +211,8 @@ export default function MyAppointments() {
             My Appointments
           </h1>
           <p className="max-w-3xl text-2xl font-bold leading-tight text-slate-500">
-            Review your upcoming clinical history and manage your healthcare schedule through our encrypted portal.
+            Review your upcoming clinical history and manage your healthcare
+            schedule through our encrypted portal.
           </p>
         </header>
 
@@ -220,8 +226,10 @@ export default function MyAppointments() {
         {/* FOOTER */}
         <footer className="mt-8 flex flex-col items-center justify-between gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 sm:flex-row">
           <div className="flex items-center gap-4">
-             <span className="px-3 py-1 bg-slate-100 rounded-md">PULSEPOINT CORE v3.0</span>
-             <span>AES-256 ENCRYPTION ACTIVE</span>
+            <span className="px-3 py-1 bg-slate-100 rounded-md">
+              PULSEPOINT CORE v3.0
+            </span>
+            <span>AES-256 ENCRYPTION ACTIVE</span>
           </div>
           <span>Sync Status: Automated</span>
         </footer>
