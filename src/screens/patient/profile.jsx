@@ -72,40 +72,47 @@ export default function Profile() {
 
   setFormData((prev) => ({ ...prev, [name]: value }));
 };
-
 const saveChanges = async () => {
-  if (!docId) return;
-
-  if (!formData.age || !formData.bloodGroup) {
-    toast.success("Please complete age and blood group.");
-    return;
-  }
-
-  if (!/^\d{10}$/.test(formData.phone)) {
-    toast.success("Primary phone must be exactly 10 digits.");
-    return;
-  }
-
-  if (formData.emergencyPhone && !/^\d{10}$/.test(formData.emergencyPhone)) {
-    toast.success("Emergency phone must be exactly 10 digits.");
-    return;
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-    toast.success("Please enter a valid email address.");
-    return;
-  }
-
   try {
-    const userRef = doc(db, "patients", docId);
-    await updateDoc(userRef, formData);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      toast.error("User not authenticated.");
+      return;
+    }
 
-    setUser(formData);
+    let userRef;
+
+    // If document already exists → update
+    if (docId) {
+      userRef = doc(db, "patients", docId);
+      await updateDoc(userRef, formData);
+      toast.success("Profile updated successfully!");
+    } 
+    // If document does NOT exist → create
+    else {
+      userRef = doc(collection(db, "patients")); // auto ID
+
+      const newPatient = {
+        ...formData,
+        email: currentUser.email,
+        patientID: userRef.id,
+        createdAt: new Date(),
+      };
+
+      await setDoc(userRef, newPatient);
+
+      setDocId(userRef.id);
+      setUser(newPatient);
+      setFormData(newPatient);
+
+      toast.success("Profile created successfully!");
+    }
+
     setIsEditing(false);
-    toast.success("Profile saved successfully!");
+
   } catch (error) {
     console.error("Error saving profile:", error);
-    toast.success("Failed to save changes.");
+    toast.error("Something went wrong.");
   }
 };
 
