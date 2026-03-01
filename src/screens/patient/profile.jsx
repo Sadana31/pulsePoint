@@ -45,7 +45,7 @@ export default function Profile() {
           const newPatient = {
             name: currentUser.displayName || "",
             email: currentUser.email,
-            patientID: currentUser.uid,
+            patientID: generatePatientID(currentUser.displayName || "PT"),
             createdAt: new Date(),
             age: "",
             bloodGroup: "",
@@ -72,6 +72,19 @@ export default function Profile() {
 
     return () => unsubscribe();
   }, []);
+
+  const generatePatientID = (name) => {
+    let cleanName = name?.trim().toUpperCase() || "PT";
+
+    if (cleanName.length === 1) {
+      cleanName += "X";
+    }
+
+    const clean = name.trim().toUpperCase();
+    const prefix = clean.substring(0, 2);
+    const random = Math.floor(100 + Math.random() * 900);
+    return `${prefix}${random}`;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
