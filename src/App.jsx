@@ -46,7 +46,7 @@ function LandingPage() {
           </h2>
 
           <p className="text-gray-500 mb-8">
-            Check symptoms, manage appointments, and view health history.
+            Manage appointments and talk to Doctors.
           </p>
 
 <button
@@ -68,7 +68,7 @@ function LandingPage() {
           </h2>
 
           <p className="text-gray-500 mb-8">
-            Access patient records and manage schedule.
+            Answer patient queries and view your schedule.
           </p>
 
           <button
