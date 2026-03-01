@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 function StatusPill({ status }) {
   const styles = {
     Confirmed: "border-[#006600] text-[#006600] bg-[#009900]/10",
-    "Awaiting confirmation": "border-amber-500 text-amber-600 bg-amber-50",
   };
 
   return (

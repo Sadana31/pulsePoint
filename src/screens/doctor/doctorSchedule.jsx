@@ -104,10 +104,6 @@ const DoctorAppointments = () => {
               </p>
               <p className="text-slate-600 font-bold italic">{apt.reason}</p>
             </div>
-
-            <button className="w-full py-4 bg-[#006666] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]">
-              Confirm & Start
-            </button>
           </div>
         ))}
       </div>
