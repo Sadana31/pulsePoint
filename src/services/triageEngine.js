@@ -1,154 +1,262 @@
 const hardEmergencyPhrases = [
-  "chest pain", 
-  "shortness of breath", 
+  "chest pain",
+  "shortness of breath",
   "difficulty breathing",
-  "unconscious", 
-  "severe bleeding", 
-  "heart attack", 
+  "unconscious",
+  "severe bleeding",
+  "heart attack",
   "stroke"
 ];
 
-// Quick Prompts
-const specificQueries = {
-  "check if my symptoms need urgent care": 
-    "I can help with that. Please describe your symptoms. I'll check for red flags like severe pain, high fever, or breathing issues to see if you need ER care or a standard clinic visit.",
-  
-  "how should i prepare for my appointment?": 
-    "To prepare: 1. Write down a timeline of symptoms. 2. List current medications. 3. Prepare your questions for the doctor.",
-  
-  "what can i do for pain relief today?": 
-    "For mild pain, try rest, ice/heat packs, or OTC medication (if safe for you). If pain is sharp, sudden, or worsening, please describe it."
-};
+// ===============================
+// SYMPTOM QUESTIONS + NOTES
+// ===============================
 
-const followUpQuestions = {
-  cardiology: [
-    "Are you experiencing shortness of breath?",
-    "Does the pain spread to your arm or jaw?"
+const symptomQuestions = {
+
+  "stomach pain": [
+    { q: "How long have you had the stomach pain?" },
+    { q: "Is the pain constant or does it come and go?" },
+    { q: "Are you experiencing nausea or vomiting?", note: "patient experiencing nausea or vomiting" }
   ],
-  orthopedics: [
-    "Did this start after an injury?",
-    "Does movement make it worse?"
+
+  "leg pain": [
+    { q: "Did the leg pain start after an injury?", note: "leg pain began after injury" },
+    { q: "Does walking make the pain worse?", note: "pain worsens with walking" },
+    { q: "Is there swelling in the leg?", note: "leg swelling present" }
   ],
-  general: [
-    "How long have you been experiencing this?",
-    "Is the symptom getting worse?"
+
+  cough: [
+    { q: "How long have you had the cough?" },
+    { q: "Is the cough dry or producing mucus?" },
+    { q: "Do you have fever along with the cough?", note: "cough with fever" }
+  ],
+
+  cold: [
+    { q: "Do you have a runny or blocked nose?" },
+    { q: "Do you have a fever?", note: "cold with fever" },
+    { q: "Are you experiencing body aches?" }
+  ],
+
+  headache: [
+    { q: "How severe is the headache?" },
+    { q: "Did it start suddenly or gradually?" },
+    { q: "Do you feel nausea or sensitivity to light?", note: "headache with nausea or light sensitivity" }
+  ],
+
+  itchiness: [
+    { q: "Where on the body are you experiencing itching?" },
+    { q: "Do you notice rash or redness?", note: "itching with rash/redness" },
+    { q: "Did this start after using a new product or food?" }
+  ],
+
+  tired: [
+    { q: "How long have you been feeling unusually tired?" },
+    { q: "Are you sleeping well at night?" },
+    { q: "Do you feel dizzy or weak along with the fatigue?", note: "fatigue with dizziness or weakness" }
+  ],
+
+  nausea: [
+    { q: "How long have you been feeling nauseous?" },
+    { q: "Have you vomited recently?", note: "patient vomiting" },
+    { q: "Did this start after eating something unusual?" }
+  ],
+
+  dizziness: [
+    { q: "Does the dizziness happen when you stand up?", note: "dizziness when standing" },
+    { q: "Do you feel like the room is spinning?", note: "possible vertigo symptoms" },
+    { q: "Have you fainted or nearly fainted?", note: "patient nearly fainted" }
+  ],
+
+  diarrhea: [
+    { q: "How long have you had diarrhea?" },
+    { q: "Are you experiencing stomach cramps?", note: "diarrhea with cramps" },
+    { q: "Do you have fever along with it?", note: "diarrhea with fever" }
+  ],
+
+  "food poisoning": [
+    { q: "When did symptoms start after eating?" },
+    { q: "Are you experiencing vomiting or diarrhea?", note: "food poisoning with vomiting/diarrhea" },
+    { q: "Are you able to drink fluids without vomiting?" }
+  ],
+
+  "eyesight blurry": [
+    { q: "Did the blurry vision start suddenly?", note: "sudden blurry vision" },
+    { q: "Is it affecting one eye or both?" },
+    { q: "Do you have headache along with it?" }
+  ],
+
+  "throat pain": [
+    { q: "Is it painful to swallow?", note: "pain while swallowing" },
+    { q: "Do you have fever along with the throat pain?", note: "throat pain with fever" },
+    { q: "Do you have cough?" }
+  ],
+
+  "sore muscles": [
+    { q: "Did the soreness start after exercise?", note: "muscle soreness after activity" },
+    { q: "Is the soreness affecting multiple muscles?" },
+    { q: "Does resting improve the pain?" }
+  ],
+
+  overeating: [
+    { q: "Are you feeling stomach discomfort or bloating?", note: "bloating after overeating" },
+    { q: "Did symptoms start immediately after eating?" },
+    { q: "Are you experiencing nausea?" }
+  ],
+
+  "no appetite": [
+    { q: "How long have you had reduced appetite?" },
+    { q: "Have you noticed weight loss recently?", note: "reduced appetite with weight loss" },
+    { q: "Are you experiencing nausea or stomach discomfort?" }
+  ],
+
+  "ear pain": [
+    { q: "Is the pain in one ear or both?" },
+    { q: "Do you have fever or hearing difficulty?", note: "ear pain with hearing issues" },
+    { q: "Did the pain start after a cold?" }
+  ],
+
+  "red eye": [
+    { q: "Is the redness in one eye or both?" },
+    { q: "Do you feel itching or burning?", note: "red eye with irritation" },
+    { q: "Is there discharge from the eye?", note: "eye discharge present" }
+  ],
+
+  "joint pain": [
+    { q: "Which joint is affected?" },
+    { q: "Did the pain start after physical activity?" },
+    { q: "Is there swelling or stiffness?", note: "joint swelling or stiffness" }
   ]
 };
 
-const categoryMap = {
-  cardiology: ["heart", "chest", "blood pressure"],
-  orthopedics: ["back", "leg", "joint", "bone", "pain"],
-  general: ["fever", "vomiting", "infection", "headache"]
-};
+// ===============================
+// DETECT SYMPTOM
+// ===============================
 
-function detectCategory(message) {
-  for (const [category, keywords] of Object.entries(categoryMap)) {
-    if (keywords.some(keyword => message.includes(keyword))) {
-      return category;
-    }
+function detectSymptom(message) {
+  const symptoms = Object.keys(symptomQuestions);
+  for (const s of symptoms) {
+    if (message.includes(s)) return s;
   }
-  return "general";
+  return null;
 }
+
+// ===============================
+// GIBBERISH CHECK
+// ===============================
+
+function looksLikeGibberish(text) {
+
+  if (text.length < 2) return true;
+
+  const repeated = /(.)\1{3,}/;
+  if (repeated.test(text)) return true;
+
+  if (!/[aeiou]/.test(text) && text.length > 4) return true;
+
+  return false;
+}
+
+// ===============================
+// TRIAGE SUMMARY BUILDER
+// ===============================
+
+function buildTriageSummary(state) {
+
+  const symptom = state.symptom || "unspecified symptom";
+  const notes = state.triageNotes || [];
+
+  if (notes.length === 0) {
+    return `Chief Complaint: ${symptom}`;
+  }
+
+  return `Chief Complaint: ${symptom}\nAssociated Findings:\n• ${notes.join("\n• ")}`;
+}
+
+// ===============================
+// MAIN BOT LOGIC
+// ===============================
 
 export function classifyMessage(rawMessage, previousState = null) {
+
   const message = rawMessage.toLowerCase().trim();
 
-  // ===============================
-  // 1️⃣ STRICT EMERGENCY CHECK FIRST
-  // ===============================
-
-  // If user types SEVERE directly
-  if (message === "severe") {
+  if (["hi","hello","hey"].includes(message)) {
     return {
-      botResponse: "🚨 Severe symptoms detected. Redirecting you to emergency care immediately.",
-      emergency: true,
-      navigate: "/emergency"
+      botResponse: "Hello! Please describe your symptoms.",
+      state: previousState
     };
   }
 
-  // Hard emergency phrases
+  if (["bye","goodbye","exit"].includes(message)) {
+    return {
+      botResponse: "Take care! Feel free to return if you need help.",
+      final: true
+    };
+  }
+
+  if (message.includes("anxiety")) {
+    return {
+      botResponse: "Mental health support may help. Redirecting you to psychiatric consultation.",
+      navigate: "/psychatric"
+    };
+  }
+
   if (hardEmergencyPhrases.some(p => message.includes(p))) {
     return {
-      botResponse: "🚨 Critical symptoms detected. Please seek emergency medical care immediately.",
+      botResponse: "🚨 Critical symptoms detected. Please seek emergency care immediately.",
       emergency: true,
       navigate: "/emergency"
     };
   }
 
-// ===============================
-// GIBBERISH CHECK (Improved)
-// ===============================
-
-const validShortWords = ["hi", "ok", "no", "yes"];
-
-const isOnlyLetters = /^[a-zA-Z]+$/.test(message);
-const hasNoSpaces = !message.includes(" ");
-const tooRandom = message.length > 4 && isOnlyLetters && hasNoSpaces;
-
-if (
-  message.length < 2 ||
-  validShortWords.includes(message) === false &&
-  tooRandom
-) {
-  return {
-    botResponse:
-      "I'm sorry, I didn’t understand that. Please clearly describe your symptoms so I can assist you.",
-    state: previousState
-  };
-}
-  // ===============================
-  // 3️⃣ SOCIAL RESPONSES
-  // ===============================
-
-  if (["thanks", "thank you"].includes(message)) {
+  if (looksLikeGibberish(message)) {
     return {
-      botResponse: "You're welcome! I'm here if you need anything else.",
+      botResponse: "Please clearly describe your symptoms.",
       state: previousState
     };
   }
 
-  if (message === "help me") {
-    return {
-      botResponse: "I’m here to help. What symptoms are you experiencing?",
-      state: previousState
-    };
+  let state = previousState || {};
+
+  state.symptom = state.symptom || null;
+  state.askedQuestions = state.askedQuestions || [];
+  state.triageNotes = state.triageNotes || [];
+
+  if (!state.symptom) {
+    const detected = detectSymptom(message);
+
+    if (detected) state.symptom = detected;
+    else {
+      return {
+        botResponse: "Could you describe your symptoms in a bit more detail?",
+        state
+      };
+    }
   }
 
-  // ===============================
-  // 4️⃣ QUICK PROMPTS
-  // ===============================
+  const questions = symptomQuestions[state.symptom];
 
-  if (specificQueries[message]) {
-    return {
-      botResponse: specificQueries[message],
-      state: previousState
-    };
-  }
-
-  // ===============================
-  // 5️⃣ NORMAL TRIAGE FLOW
-  // ===============================
-
-  let state = previousState || {
-    symptoms: [],
-    askedQuestions: []
-  };
-
-  if (!["yes", "no"].includes(message)) {
-  state.symptoms.push(message);
-}
-
-  const category = detectCategory(state.symptoms.join(" "));
-  const questions = followUpQuestions[category];
-
-  const nextQuestion = questions.find(
-    q => !state.askedQuestions.includes(q)
+  const next = questions.find(
+    item => !state.askedQuestions.includes(item.q)
   );
 
-  if (nextQuestion) {
-    state.askedQuestions.push(nextQuestion);
+  if (["yes","no"].includes(message) && state.askedQuestions.length) {
+
+    const lastQ = state.askedQuestions[state.askedQuestions.length-1];
+    const qObj = questions.find(q => q.q === lastQ);
+
+    if (message === "yes" && qObj?.note) {
+      state.triageNotes.push(qObj.note);
+    }
+  }
+
+  if (next) {
+
+    state.askedQuestions.push(next.q);
+
     return {
-      botResponse: nextQuestion,
+      botResponse: next.q,
       state
     };
   }
@@ -156,6 +264,9 @@ if (
   return {
     botResponse:
       "Based on your responses, I recommend scheduling a consultation for further evaluation.",
-    final: true
+    final: true,
+    showBookAppointment: true,
+    triageSummary: buildTriageSummary(state),
+    symptom: state.symptom
   };
 }

@@ -20,6 +20,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     { label: "My Appointments ", path: "/myvisits", icon: "📋" },
     { label: "Medical Library", path: "/library", icon: "📚" },
     { label: "Message a Doctor", path: "/messageDoctor", icon: "🥼" },
+    { label: "Psychatric Counselling", path: "/psychatric", icon: "🧠" },
   ];
 
   // FETCH USER NAME

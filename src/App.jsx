@@ -19,6 +19,7 @@ import DoctorLayout from "./components/doctorLayout";
 import DoctorAppointments from "./screens/doctor/doctorSchedule";
 import MyAnswers from "./screens/patient/myAnswers";
 import { Toaster } from "react-hot-toast";
+import Wellness from "./screens/patient/psychatricCounselling";
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -104,6 +105,7 @@ export default function App() {
           <Route path="/messageDoctor" element={<MessageDoctor />} />
           <Route path="/reschedule" element={<RescheduleAppointment />} />
           <Route path="/answers" element={<MyAnswers />} />
+          <Route path="/psychatric" element={<Wellness />} />
         </Route>
 
         <Route element={<DoctorLayout />}>
